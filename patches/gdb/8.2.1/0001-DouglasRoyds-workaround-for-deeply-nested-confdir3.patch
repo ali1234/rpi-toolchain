@@ -1,0 +1,63 @@
+From c9fecb0c749e333a1b2a2e0eaad721428cd94f15 Mon Sep 17 00:00:00 2001
+From: Alistair Buxton <a.j.buxton@gmail.com>
+Date: Sun, 13 Oct 2019 22:53:26 +0100
+Subject: [PATCH] DouglasRoyds workaround for deeply nested confdir3
+
+Work around a problem with Docker where deeply nested directories
+can be created but not deleted.
+
+Original bug: https://github.com/moby/moby/issues/13451
+
+Original patch: https://github.com/LedgerHQ/dockcross/commit/f7960de6456e5a5987f31efa863dc858e239d758
+
+Original patch only patches the M4, but ct-ng does not usually rebuild
+configure. Therefore the patch has been updated to also make the fix
+in the distributed configure script.
+---
+ gdb/gnulib/configure                    | 9 +++++++++
+ gdb/gnulib/import/m4/getcwd-path-max.m4 | 9 +++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/gdb/gnulib/configure b/gdb/gnulib/configure
+index a152abc..893fd00 100644
+--- a/gdb/gnulib/configure
++++ b/gdb/gnulib/configure
+@@ -16590,6 +16590,15 @@ main ()
+ 
+     /* Try rmdir first, in case the chdir failed.  */
+     rmdir (DIR_NAME);
++    /* Getting rid of the very bottom dirs inside a Docker container is tricky */
++    if (chdir ("../../..") < 0) exit (errno);
++    rename (DIR_NAME"/"DIR_NAME"/"DIR_NAME, "b");
++    rename (DIR_NAME"/"DIR_NAME, "c");
++    rename (DIR_NAME, "d");
++    rmdir ("b");
++    rmdir ("c");
++    rmdir ("d");
++    /* Now for the rest */
+     for (i = 0; i <= n_chdirs; i++)
+       {
+         if (chdir ("..") < 0)
+diff --git a/gdb/gnulib/import/m4/getcwd-path-max.m4 b/gdb/gnulib/import/m4/getcwd-path-max.m4
+index 90bbc77..9dcb230 100644
+--- a/gdb/gnulib/import/m4/getcwd-path-max.m4
++++ b/gdb/gnulib/import/m4/getcwd-path-max.m4
+@@ -189,6 +189,15 @@ main ()
+ 
+     /* Try rmdir first, in case the chdir failed.  */
+     rmdir (DIR_NAME);
++    /* Getting rid of the very bottom dirs inside a Docker container is tricky */
++    if (chdir ("../../..") < 0) exit (errno);
++    rename (DIR_NAME"/"DIR_NAME"/"DIR_NAME, "b");
++    rename (DIR_NAME"/"DIR_NAME, "c");
++    rename (DIR_NAME, "d");
++    rmdir ("b");
++    rmdir ("c");
++    rmdir ("d");
++    /* Now for the rest */
+     for (i = 0; i <= n_chdirs; i++)
+       {
+         if (chdir ("..") < 0)
+-- 
+2.17.1
+
