@@ -19,22 +19,28 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+     
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ gperf bison flex texinfo help2man make libncurses5-dev \
+          python3-dev autoconf automake libtool libtool-bin gawk wget bzip2 xz-utils unzip \
+          patch libstdc++6 rsync wget git
 
-      # Runs a single command using the runners shell
-      - name: Run the build
+      - name: Install Crosstool NG
+        run: |
+          wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.24.0.tar.xz
+          tar xf crosstool-ng-1.24.0.tar.xz
+          cd crosstool-ng-1.24.0
+          ./configure
+          make
+          sudo make install
+
+      - name: Build
         run: make
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            *.tar.xz
-            *.tar.xz.asc

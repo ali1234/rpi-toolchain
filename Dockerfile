@@ -1,10 +1,11 @@
-FROM ubuntu:eoan
+FROM ubuntu:focal
 
 ARG CTVER=1.24.0
 ARG UID=1000
 ARG GID=1000
 ARG USER=toolchain
 ARG GROUP=toolchain
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
 RUN apt-get install -y gcc g++ gperf bison flex texinfo help2man make libncurses5-dev \
