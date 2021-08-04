@@ -12,8 +12,8 @@ RUN apt-get install -y gcc g++ gperf bison flex texinfo help2man make libncurses
     python3-dev autoconf automake libtool libtool-bin gawk wget bzip2 xz-utils unzip \
     patch libstdc++6 rsync wget git
 
-RUN wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-$CTVER.tar.xz && \
-    tar xf crosstool-ng-$CTVER.tar.xz && \
+RUN wget -P src/ http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-$CTVER.tar.xz && \
+    tar xf src/crosstool-ng-$CTVER.tar.xz && \
     cd crosstool-ng-$CTVER && \
     ./configure && \
     make && make install
@@ -25,5 +25,4 @@ USER $USER
 RUN mkdir -p /home/$USER/rpi-toolchain
 WORKDIR /home/$USER/rpi-toolchain
 COPY --chown=toolchain:toolchain . .
-RUN make
 

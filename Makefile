@@ -48,7 +48,9 @@ reallyclean: clean
 
 indocker:
 	docker build -t rpi-toolchain .
-	docker create -ti --name rpi-toolchain-tmp rpi-toolchain
+	docker create -it --name rpi-toolchain-tmp rpi-toolchain
+	docker start rpi-toolchain-tmp
+	docker exec -it rpi-toolchain-tmp make
 	docker cp rpi-toolchain-tmp:/home/toolchain/rpi-toolchain/$(TOOLCHAIN).tar.xz .
 	docker cp rpi-toolchain-tmp:/home/toolchain/rpi-toolchain/$(TOOLCHAIN).tar.xz.asc .
 	docker cp rpi-toolchain-tmp:/home/toolchain/rpi-toolchain/$(SRC).tar.xz .
