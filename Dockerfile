@@ -1,4 +1,4 @@
-FROM ubuntu:eoan
+FROM ubuntu:focal
 
 ARG CTVER=1.24.0
 ARG UID=1000
